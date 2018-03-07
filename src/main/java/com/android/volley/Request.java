@@ -485,14 +485,10 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     private byte[] encodeParameters(Map<String, String> params, String paramsEncoding) {
        StringBuilder encodedParams = new StringBuilder();
         try {
+            /* if content-type is json */
             if (getBodyContentType().equals("application/json")) {
-
-                if (params != null && params.size() > 0) {
                     JSONObject obj = new JSONObject(params);
                     return obj.toString().getBytes(getParamsEncoding());
-                }
-                return null;
-
             } else {
                 for (Map.Entry<String, String> entry : params.entrySet()) {
                     encodedParams.append(URLEncoder.encode(entry.getKey(), paramsEncoding));
