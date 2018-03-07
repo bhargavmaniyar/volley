@@ -484,7 +484,19 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      */
     private byte[] encodeParameters(Map<String, String> params, String paramsEncoding) {
         StringBuilder encodedParams = new StringBuilder();
+        
+        
         try {
+            /* If content-type is JSON  */
+            if(getBodyContentType().equals("application/json")) {
+                Map<String, String> params = getParams();
+                if (params != null && params.size() > 0) {
+                    JSONObject obj=new JSONObject(params);
+                    return obj.toString().getBytes(getParamsEncoding());
+                }
+                return null;
+            }
+        }else {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 encodedParams.append(URLEncoder.encode(entry.getKey(), paramsEncoding));
                 encodedParams.append('=');
@@ -496,6 +508,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
             throw new RuntimeException("Encoding not supported: " + paramsEncoding, uee);
         }
     }
+}
 
     /**
      * Set whether or not responses to this request should be cached.
