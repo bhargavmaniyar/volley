@@ -483,27 +483,25 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      * Converts <code>params</code> into an application/x-www-form-urlencoded encoded string.
      */
     private byte[] encodeParameters(Map<String, String> params, String paramsEncoding) {
-        StringBuilder encodedParams = new StringBuilder();
-        
-        
+       StringBuilder encodedParams = new StringBuilder();
         try {
-            /* If content-type is JSON  */
-            if(getBodyContentType().equals("application/json")) {
-                Map<String, String> params = getParams();
+            if (getBodyContentType().equals("application/json")) {
+
                 if (params != null && params.size() > 0) {
-                    JSONObject obj=new JSONObject(params);
+                    JSONObject obj = new JSONObject(params);
                     return obj.toString().getBytes(getParamsEncoding());
                 }
                 return null;
+
+            } else {
+                for (Map.Entry<String, String> entry : params.entrySet()) {
+                    encodedParams.append(URLEncoder.encode(entry.getKey(), paramsEncoding));
+                    encodedParams.append('=');
+                    encodedParams.append(URLEncoder.encode(entry.getValue(), paramsEncoding));
+                    encodedParams.append('&');
+                }
+                return encodedParams.toString().getBytes(paramsEncoding);
             }
-        }else {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                encodedParams.append(URLEncoder.encode(entry.getKey(), paramsEncoding));
-                encodedParams.append('=');
-                encodedParams.append(URLEncoder.encode(entry.getValue(), paramsEncoding));
-                encodedParams.append('&');
-            }
-            return encodedParams.toString().getBytes(paramsEncoding);
         } catch (UnsupportedEncodingException uee) {
             throw new RuntimeException("Encoding not supported: " + paramsEncoding, uee);
         }
